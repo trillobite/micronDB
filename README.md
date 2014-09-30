@@ -20,22 +20,49 @@ The goal with all my projects is to produce libraries and data structures which 
 
 Queries:
 ```
+//will get all the jsonHTML buttons
 micronDB.query({
     where: {
         type: 'button',
     },
 });
 
+//will get all the jsonHTML div elements
 micronDB.query({
     where: {
         type: 'div',
     },
 });
 
+//will get all the canvas text elements that contain the string 'MicronDB.'
 micronDB.query({
     where: {
-        text: function(input) {
+        text: function(input) { //The id string, contains the string 'MicronDB.'
             return input.indexOf('MicronDB') > -1;
+        },
+    },
+});
+
+//will get all the objects with 'Text' in its id, and text elements that are set to the color black.
+micronDB.query({
+    where: {
+        $or: {
+            id: function(input) { //The id string, contains the string 'Text.'
+                return input.indexOf('Text') > -1;
+            },
+            fill: 'black',
+        },
+    },
+});
+
+//will get all the canvas text objects that are set to the color black.
+micronDB.query({
+    where: {
+        $and: {
+            id: function(input) { //The id string, contains the string 'Text.'
+                return input.indexOf('Text') > -1;
+            },
+            fill: 'black',
         },
     },
 });

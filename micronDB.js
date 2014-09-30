@@ -87,17 +87,59 @@ var micronDB = {
             return found;
         };
         var result = [];
-        for(var property in key) {
-            var tmp = {};
-            tmp[property] = key[property];
+        var used = 0;
+        var funcAnd = function(tmp, db, key, property) { //handle the $and statement.
             if(typeof key[property] != 'undefined' && typeof property != 'number') {
-                if(result.length === 0) {
+                if(!used) {
                     result = find(tmp, db);
-                    console.log('result', result);
                 } else {
-                    result = find(tmp, result);
-                    console.log('result', result);
+                    if(result.length > 0) { //if the previous $and query found nothing, then do not add anything.
+                        result = find(tmp, result); //make sure all the objects picked up in the current query still fit the next definition.
+                    }
                 }
+            }
+            ++used; //determines how many times the $and is used.
+        };
+        var funcOr = function(tmp, db, key, property) { //handle the $or statement.
+            if(typeof key[property] != 'undefined' && typeof property != 'number') {
+                var found = find(tmp, db);
+                if(result.length > 0) { //because it's an or, you want all the objects that fit the bill.
+                    var exists = function(obj, arr) {
+                        for(var j = 0; j < arr.length; ++j) {
+                            if(arr[j] == obj) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    };
+                    for(var i = 0; i < found.length; ++i) {
+                        if(!(exists(found[i], result))) {
+                            result[result.length] = found[i];
+                        }
+                    }
+                } else {
+                    result = find(tmp, db);
+                }
+            }
+        };
+        for(var initProperty in key) {
+            if(initProperty == '$and') {
+                used = 0; //allows the use of $and multiple times in one query.
+            }
+            var tmp = {};
+            tmp[initProperty] = key[initProperty];
+            if(initProperty == '$or' || initProperty == '$and') {
+                for(var property in tmp[initProperty]) { //what's inside the $or / $and property?
+                    var nwTmp = {};
+                    nwTmp[property] = tmp[initProperty][property];
+                    if(initProperty == '$or') {
+                        funcOr(nwTmp, db, tmp[initProperty], property);
+                    } else {
+                        funcAnd(nwTmp, db, tmp[initProperty], property);
+                    }
+                }
+            } else {
+                funcAnd(tmp, db, key, initProperty);
             }
         }
         return result;
