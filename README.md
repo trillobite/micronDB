@@ -20,6 +20,10 @@ The goal with all my projects is to produce libraries and data structures which 
 
 Queries:
 ```
+//insert object
+micronDB.insert(yourJsonObject); //make sure it has an id feild!
+
+
 //will get all the jsonHTML buttons
 micronDB.query({
     where: {
