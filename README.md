@@ -1,6 +1,16 @@
 micronDB
 ========
-
+```
+          `7MM"""Yb. `7MM"""Yp, 
+            MM    `Yb. MM    Yb 
+MM    MM    MM     `Mb MM    dP 
+MM    MM    MM      MM MM"""bg. 
+MM    MM    MM     ,MP MM    `Y 
+MM    MM    MM    ,dP' MM    ,9 
+MVbgd"'Ybo.JMMmmmdP' .JMMmmmd9  
+M.                              
+M8 github.com/trillobite/micronDB
+```
 A Micro Client-side JSON Document Storage Database
 
 Designed to be used with jsonHTML in which you will be able to query over all the documents on the DOM. A new version of jsonHTML will be released that will automatically detect if you have MicronDB included
