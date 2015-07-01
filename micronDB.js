@@ -56,15 +56,13 @@ var micronDB = function() {
         },
         remove: function(key) {
             var indx = this.calcIndex(key);
-            return this.hashTraverse(indx, function(obj) {
-                if(obj.id == key) {
-                    obj = undefined;
-                    if(!(obj)) {
-                        return true;
+            if(this.db[indx]) { //If something is in the hash row.
+                for(var i = 0; i < this.db[indx].length; ++i) {
+                    if(this.db[indx][i]) { //if the object exists.
+                        return delete this.db[indx][i] //deletes and returns weather the object was deleted. Returns true if section is undefined.
                     }
-                    return false;
                 }
-            });
+            }
         },
         
         match: {
@@ -178,3 +176,19 @@ var micronDB = function() {
         },
     };
 };
+/*
+c            (
+o        )   )
+p        (
+y    .---------------------.
+r    |        _____        |___      
+i    |     .'`_,-._`'.      __ \
+g    |    /  ( [ ] )  \    |  ||
+h    |   /.-""`( )`""-.\   |  ||
+t    |  ' <'```(.)```'> '  | _||
+     |    <'```(.)```'>    |/ _/
+2    |     <'``(.)``'>      ./
+0    |      <``\_/``>      |
+1    |       `'---'`       |
+5    \github.com/trillobite/              
+       \_________________/      Keep it black*/
