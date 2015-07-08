@@ -26,7 +26,7 @@ the page to be easily manipulated, changing the form and style of the entire pag
 
 The goal with all my projects is to produce libraries and data structures which allow the programmer to more effectively practice "Rapid Development."
 
-Queries: 
+Queries and commands: 
 ```
 //initialize a new micronDB instance
 var canvasObjs = new micronDB();
@@ -34,6 +34,13 @@ var canvasObjs = new micronDB();
 //insert object
 canvasObjs.insert(yourJsonObject); //make sure it has an id field!
 
+//get a single object by id:
+canvasObjs.get("TextjGu1arrQ0l5y"); 
+
+//remove the object from the DB:
+canvasObjs.remove("TextjGu1arrQ0l5y"); //should return true if successful.
+
+//QUERIES:
 
 //will get all the jsonHTML buttons
 arrdb.query({function() {
