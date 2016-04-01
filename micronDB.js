@@ -1,3 +1,4 @@
+
 /*
     FILE: 
         MICRONDB.JS
@@ -7,43 +8,7 @@
         memory operations. This was an experiment of mine, and 
         is actually used quite often in my projects. Refer to 
         the readme for more information.
-
         Enjoy!
-    AUTHOR: 
-                     (
-                 )   )
-                 (
-             .---------------------.
-             |        _____        |___      
-             |     .'`_,-._`'.      __ \
-             |    /  ( [ ] )  \    |  ||
-             |   /.-""`( )`""-.\   |  ||
-             |  ' <'```(.)```'> '  | _||
-             |    <'```(.)```'>    |/ _/
-        2    |     <'``(.)``'>      ./
-        0    |      <``\_/``>      |
-        1    |       `'---'`       |
-        5    \github.com/trillobite/              
-               \_________________/      Keep it black
-    COPYRIGHT: 
-
-        BY USING THIS CODE/SOFTWARE, YOU AGREE TO FOLLOW
-        AND UNDERSTAND WHAT IS WRITTEN BELOW:
-
-        COMMERCIAL AND PERSONAL USE IS PERMITTED.
-        SOFTWARE DOES NOT COME WITH ANY WARRANTIES OR
-        GUARANTEE'S USE AT YOUR OWN RISK! 
-
-        MODIFICATIONS TO THIS SOURCE MUST BE DOCUMENTED
-        WITH AUTHORS NAME, REASON FOR MODIFICATION, AND
-        DATE MODIFICATION WAS MADE.
-
-        GOVERNMENT USE IS INTERPRETED THE SAME AS 
-        COMMERCIAL, READ BELOW.
-
-        IF USED IN A COMMERCIAL ENVIRONMENT, CONTACT THE
-        AUTHOR OF THIS SOFTWARE, AS HE IS VERY INTERESTED
-        IN HOW POPULAR HIS SOFTWARE IS BECOMING.
 */
 
 // get instance using myDB = new micronDB();
@@ -63,30 +28,66 @@ var micronDB = function() {
             return false;
         },
         calcIndex: function(data) { //takes a string
-            var total = 0;
-            for(var i = 0; i < data.length; ++i) {
-                total += data.charCodeAt(i);
+            if(data) {
+                var total = 0;
+                for(var i = 0; i < data.length; ++i) {
+                    total += data.charCodeAt(i);
+                }
+                return total % 50; //max hash table size.
             }
-            return total % 50; //max hash table size.
+            return -1;
         },
         exists: function(data) { //takes a string object.
             var indx = this.calcIndex(data);
             return this.hashTraverse(indx, function(obj) {
-                if(obj.id == data) {
-                    return true;
-                }
+                return obj.id == data;
             });
         },
-        hash: function(data) {
-            if(!(this.exists(data))) {
+        //trying to make micronDB handle the creation of ID's.
+        makeID: function() {
+            var scope = new micronDB();
+            var sanity = 0;
+            var idLen = 8;
+            var gen = function() { //ID generator.
+                var nwID = "";
+                var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+                for(var i = 0; i < idLen; ++i) { nwID += chars.charAt(Math.floor(Math.random() * chars.length)) }
+                return nwID;
+            };
+
+            var verify = function(nwID) {
+                var check = function() { //ensures that ID's are not wasted.
+                    var loops = Math.pow(idLen, 2)*62; //max loops determined by how many ID's can be generated.
+                    while(scope.exists(nwID) && sanity < loops) { //will go through and make sure all possible id's are used.
+                        ++sanity;
+                        nwID = gen();
+                    }
+                };
+
+                check();
+
+                if(scope.exists(nwID)) { //if failed to fix the collision.
+                    idLen = Math.round((idLen / 2) + idLen); //increase max length of ID's.
+                    check();
+                }
+                
+                return nwID;
+            };
+
+            return verify(gen());
+        },
+
+        hash: function(data) { //Adds a JSON formatted object, and stores it.
+            data.id = (undefined === data.id) ? this.makeID() : data.id; //Checks if object has an ID, and creates one if required.
+            if(!(this.exists(data.id))) {
                 var indx = this.calcIndex(data.id);
                 if(this.db[indx]) {
                     this.db[indx][this.db[indx].length] = data;
-                    return true; //success
+                    return data; //success
                 } else {
                     this.db[indx] = [];
                     this.db[indx][this.db[indx].length] = data;
-                    return true; //success
+                    return data; //success
                 }
             } else {
                 return false; //already exists
@@ -205,7 +206,7 @@ var micronDB = function() {
             return result;
         },
         insert: function(obj) {
-            this.hash(obj);
+            return this.hash(obj);
         },
         query: function(query) {
             var current;
@@ -222,3 +223,20 @@ var micronDB = function() {
         },
     };
 };
+/*  View full license in LICENSE.md
+             )
+c            (
+o        )   )
+p        (           v1.3.1
+y    .---------------------.
+r    |        _____        |___      
+i    |     .'`_,-._`'.      __ \
+g    |    /  ( [ ] )  \    |  ||
+h    |   /.-""`( )`""-.\   |  ||
+t    |  ' <'```(.)```'> '  | _||
+     |    <'```(.)```'>    |/ _/
+2    |     <'``(.)``'>      ./
+0    |      <``\_/``>      |
+1    |       `'---'`       |
+6    \github.com/trillobite/              
+       \_________________/      Keep it black, keep it free.*/
